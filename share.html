@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shpots - Share</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, #4ECDC4, #F7A072);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background: #4ECDC4;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+        }
+        .info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        .redirect-info {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📍</div>
+        <h1>Shpots Share</h1>
+        <p class="subtitle">A spot or collection is being shared with you!</p>
+        
+        <div class="buttons">
+            <a href="#" id="openApp" class="btn btn-primary">Open in Shpots App</a>
+            <a href="https://apps.apple.com/app/shpots/id6504374906" class="btn btn-secondary">Download Shpots</a>
+        </div>
+        
+        <div class="info">
+            <strong>About this share:</strong>
+            <div id="shareInfo">Loading share details...</div>
+        </div>
+        
+        <div class="redirect-info">
+            Attempting to open Shpots automatically...
+        </div>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const shareType = urlParams.get('type');
+        
+        // Display share information
+        function displayShareInfo() {
+            const infoDiv = document.getElementById('shareInfo');
+            
+            if (shareType === 'spot') {
+                const title = urlParams.get('title') || 'Unknown Spot';
+                const lat = urlParams.get('lat');
+                const lng = urlParams.get('lng');
+                const city = urlParams.get('city');
+                const state = urlParams.get('state');
+                
+                let location = '';
+                if (city && state) {
+                    location = ` in ${city}, ${state}`;
+                } else if (lat && lng) {
+                    location = ` at ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}`;
+                }
+                
+                infoDiv.innerHTML = `
+                    <div><strong>Spot:</strong> ${title}</div>
+                    <div><strong>Location:</strong> ${location}</div>
+                `;
+            } else if (shareType === 'collection') {
+                const name = urlParams.get('name') || 'Unknown Collection';
+                const spotCount = urlParams.get('spotCount') || '0';
+                const description = urlParams.get('description');
+                
+                infoDiv.innerHTML = `
+                    <div><strong>Collection:</strong> ${name}</div>
+                    <div><strong>Spots:</strong> ${spotCount} spot${spotCount === '1' ? '' : 's'}</div>
+                    ${description ? `<div><strong>Description:</strong> ${description}</div>` : ''}
+                `;
+            } else {
+                infoDiv.innerHTML = 'Invalid share link';
+            }
+        }
+        
+        // Build deep link URL
+        function buildDeepLink() {
+            if (shareType === 'spot') {
+                const params = new URLSearchParams();
+                ['title', 'lat', 'lng', 'tags', 'city', 'state', 'country', 'notes', 'date'].forEach(key => {
+                    const value = urlParams.get(key);
+                    if (value) params.set(key, value);
+                });
+                return `shpots://import?${params.toString()}`;
+            } else if (shareType === 'collection') {
+                const params = new URLSearchParams();
+                ['name', 'color', 'spotCount', 'description', 'spots'].forEach(key => {
+                    const value = urlParams.get(key);
+                    if (value) params.set(key, value);
+                });
+                return `shpots://import-collection?${params.toString()}`;
+            }
+            return null;
+        }
+        
+        // Set up the deep link
+        const deepLink = buildDeepLink();
+        if (deepLink) {
+            document.getElementById('openApp').href = deepLink;
+            
+            // Attempt automatic redirect after a short delay
+            setTimeout(() => {
+                window.location.href = deepLink;
+            }, 1000);
+        }
+        
+        // Display the share information
+        displayShareInfo();
+    </script>
+</body>
+</html>
