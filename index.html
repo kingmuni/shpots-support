@@ -91,11 +91,7 @@
         <!-- Contact Support -->
         <section class="contact-section" aria-labelledby="contact-heading">
             <h2 id="contact-heading">Contact Support</h2>
-            <p>If you need help with Shpots or have questions, please reach out to us:</p>
-            <div class="contact-row">
-                <strong>Email:</strong> <a href="mailto:support@shpots.app">support@shpots.app</a><br>
-                <strong>Response Time:</strong> Within 24–48 hours
-            </div>
+            <p>If you need help with Shpots or have questions, send us a message below:</p>
 
             <h3>Contact Form</h3>
             <p>You can also send us a message directly using the form below:</p>
@@ -196,8 +192,8 @@
                         statusDiv.style.display = 'block';
                         form.reset();
                     })
-                    .catch(function (error) {
-                        statusDiv.innerHTML = 'Failed to send message. Please try again or email us directly at <strong>support@shpots.app</strong>.';
+                                .catch(function (error) {
+                                    statusDiv.innerHTML = 'Failed to send message. Please try again later.';
                         statusDiv.classList.add('error');
                         statusDiv.style.display = 'block';
                         console.error('EmailJS error:', error);
